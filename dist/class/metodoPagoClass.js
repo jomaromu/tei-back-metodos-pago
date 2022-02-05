@@ -11,25 +11,25 @@ class MetodoPagoClass {
     crearMetodoPago(req, resp) {
         const nuevoMetodoPago = new metodoPagoModel_1.default({
             idCreador: req.usuario._id,
-            nombre: req.body.nombre
+            nombre: req.body.nombre,
         });
         nuevoMetodoPago.save((err, metodoDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
                     mensaje: `Error interno`,
-                    err
+                    err,
                 });
             }
             return resp.json({
                 ok: true,
                 mensaje: `Método de pago ${req.body.nombre} creado`,
-                metodoDB
+                metodoDB,
             });
         });
     }
     editarMetodoPago(req, resp) {
-        const id = req.get('id');
+        const id = req.get("id");
         const nombreBody = req.body.nombre;
         // const estadBody: string = req.body.estado;
         // const estado: boolean = castEstado(estadoHeader);
@@ -38,14 +38,14 @@ class MetodoPagoClass {
         const query = {
             nombre: nombreBody,
             estado: estado,
-            nivel: nivelBody
+            nivel: nivelBody,
         };
         metodoPagoModel_1.default.findById(id, (err, metodoDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
                     mensaje: `Error interno`,
-                    err
+                    err,
                 });
             }
             if (!metodoDB) {
@@ -65,25 +65,25 @@ class MetodoPagoClass {
                     return resp.json({
                         ok: false,
                         mensaje: `Error interno`,
-                        err
+                        err,
                     });
                 }
                 return resp.json({
                     ok: true,
-                    mensaje: 'Método actuaizado',
-                    metodoDB
+                    mensaje: "Método actuaizado",
+                    metodoDB,
                 });
             });
         });
     }
     obtenerMetodoID(req, resp) {
-        const id = req.get('id');
+        const id = req.get("id");
         metodoPagoModel_1.default.findById(id, (err, metodoDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
                     mensaje: `Error interno`,
-                    err
+                    err,
                 });
             }
             if (!metodoDB) {
@@ -94,36 +94,56 @@ class MetodoPagoClass {
             }
             return resp.json({
                 ok: true,
-                metodoDB
+                metodoDB,
             });
         });
     }
     obtenerTododsMetodos(req, resp) {
-        const estado = req.get('estado');
+        const estado = req.get("estado");
         // const estado: boolean = castEstado(estadoHeader);
         metodoPagoModel_1.default.find({}, (err, metodosDB) => {
+            // estado: estado
             if (err) {
                 return resp.json({
                     ok: false,
                     mensaje: `Error interno`,
-                    err
+                    err,
                 });
             }
             return resp.json({
                 ok: true,
                 metodosDB,
-                cantidad: metodosDB.length
+                cantidad: metodosDB.length,
+            });
+        });
+    }
+    obtenerTododsMetodosCriterio(req, resp) {
+        const criterio = req.get("criterio");
+        const reqExpCrit = new RegExp(criterio, "i");
+        metodoPagoModel_1.default.find({ nombre: reqExpCrit }, (err, metodosDB) => {
+            // estado: estado
+            if (err) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `Error interno`,
+                    err,
+                });
+            }
+            return resp.json({
+                ok: true,
+                metodosDB,
+                cantidad: metodosDB.length,
             });
         });
     }
     eliminarMetodoID(req, resp) {
-        const id = req.get('id');
+        const id = req.get("id");
         metodoPagoModel_1.default.findByIdAndDelete(id, {}, (err, metodoDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
                     mensaje: `Error interno`,
-                    err
+                    err,
                 });
             }
             if (!metodoDB) {
@@ -134,8 +154,8 @@ class MetodoPagoClass {
             }
             return resp.json({
                 ok: true,
-                mensaje: 'Método eliminado',
-                metodoDB
+                mensaje: "Método eliminado",
+                metodoDB,
             });
         });
     }
