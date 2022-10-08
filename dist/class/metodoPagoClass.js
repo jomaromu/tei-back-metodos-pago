@@ -4,14 +4,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetodoPagoClass = void 0;
+const mongoose = require("mongoose");
+const server_1 = __importDefault(require("./server"));
 // Modelos
 const metodoPagoModel_1 = __importDefault(require("../models/metodoPagoModel"));
 class MetodoPagoClass {
     constructor() { }
     crearMetodoPago(req, resp) {
+        const idCreador = new mongoose.Types.ObjectId(req.usuario._id);
+        const nombre = req.body.nombre;
+        const estado = req.body.estado;
         const nuevoMetodoPago = new metodoPagoModel_1.default({
-            idCreador: req.usuario._id,
-            nombre: req.body.nombre,
+            idCreador,
+            nombre,
+            estado,
         });
         nuevoMetodoPago.save((err, metodoDB) => {
             if (err) {
@@ -21,24 +27,26 @@ class MetodoPagoClass {
                     err,
                 });
             }
-            return resp.json({
-                ok: true,
-                mensaje: `Método de pago ${req.body.nombre} creado`,
-                metodoDB,
-            });
+            else {
+                const server = server_1.default.instance;
+                server.io.emit("cargar-metodos", {
+                    ok: true,
+                });
+                return resp.json({
+                    ok: true,
+                    mensaje: `Método de pago creado`,
+                    metodoDB,
+                });
+            }
         });
     }
     editarMetodoPago(req, resp) {
-        const id = req.get("id");
-        const nombreBody = req.body.nombre;
-        // const estadBody: string = req.body.estado;
-        // const estado: boolean = castEstado(estadoHeader);
-        const nivelBody = Number(req.body.nivel);
+        const id = new mongoose.Types.ObjectId(req.get("id"));
+        const nombre = req.body.nombre;
         const estado = req.body.estado;
         const query = {
-            nombre: nombreBody,
-            estado: estado,
-            nivel: nivelBody,
+            nombre,
+            estado,
         };
         metodoPagoModel_1.default.findById(id, (err, metodoDB) => {
             if (err) {
@@ -57,9 +65,6 @@ class MetodoPagoClass {
             if (!query.nombre) {
                 query.nombre = metodoDB.nombre;
             }
-            if (!query.nivel) {
-                query.nivel = metodoDB.nivel;
-            }
             metodoPagoModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, metodoDB) => {
                 if (err) {
                     return resp.json({
@@ -68,11 +73,17 @@ class MetodoPagoClass {
                         err,
                     });
                 }
-                return resp.json({
-                    ok: true,
-                    mensaje: "Método actuaizado",
-                    metodoDB,
-                });
+                else {
+                    const server = server_1.default.instance;
+                    server.io.emit("cargar-metodos", {
+                        ok: true,
+                    });
+                    return resp.json({
+                        ok: true,
+                        mensaje: "Método actuaizado",
+                        metodoDB,
+                    });
+                }
             });
         });
     }
@@ -99,10 +110,10 @@ class MetodoPagoClass {
         });
     }
     obtenerTododsMetodos(req, resp) {
-        const estado = req.get("estado");
-        // const estado: boolean = castEstado(estadoHeader);
-        metodoPagoModel_1.default.find({}, (err, metodosDB) => {
-            // estado: estado
+        metodoPagoModel_1.default
+            .find({})
+            .populate("idCreador")
+            .exec((err, metodosDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -113,26 +124,6 @@ class MetodoPagoClass {
             return resp.json({
                 ok: true,
                 metodosDB,
-                cantidad: metodosDB.length,
-            });
-        });
-    }
-    obtenerTododsMetodosCriterio(req, resp) {
-        const criterio = req.get("criterio");
-        const reqExpCrit = new RegExp(criterio, "i");
-        metodoPagoModel_1.default.find({ nombre: reqExpCrit }, (err, metodosDB) => {
-            // estado: estado
-            if (err) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `Error interno`,
-                    err,
-                });
-            }
-            return resp.json({
-                ok: true,
-                metodosDB,
-                cantidad: metodosDB.length,
             });
         });
     }
@@ -146,17 +137,17 @@ class MetodoPagoClass {
                     err,
                 });
             }
-            if (!metodoDB) {
+            else {
+                const server = server_1.default.instance;
+                server.io.emit("cargar-metodos", {
+                    ok: true,
+                });
                 return resp.json({
-                    ok: false,
-                    mensaje: `No se encontró un método de pago con ese ID`,
+                    ok: true,
+                    mensaje: "Método eliminado",
+                    metodoDB,
                 });
             }
-            return resp.json({
-                ok: true,
-                mensaje: "Método eliminado",
-                metodoDB,
-            });
         });
     }
 }

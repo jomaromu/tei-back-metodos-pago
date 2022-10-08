@@ -9,9 +9,8 @@ const Schema = mongoose.Schema;
 
 const metodoPagoSchema = new Schema({
 
-    idCreador: { type: String, required: [true, 'Es necesario el ID del creador'] },
+    idCreador: { type: Schema.Types.ObjectId, ref: "userWorker" },
     nombre: { type: String, required: [true, 'EL nombre es necesario'], unique: true },
-    nivel: { type: Number, default: 1 },
     estado: { type: Boolean, default: true }
 });
 

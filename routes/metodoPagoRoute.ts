@@ -1,18 +1,12 @@
 import { Router, Request, Response } from "express";
-import {
-  crearUsuario,
-  editarMetodoPago,
-  editarUsuario,
-  eliminarUsuario,
-  verificaToken,
-} from "../auth/auth";
+import { verificaToken } from "../auth/auth";
 import { MetodoPagoClass } from "../class/metodoPagoClass";
 
 const metodoPagoRoute = Router();
 
 metodoPagoRoute.post(
   "/crearMetodo",
-  [verificaToken, crearUsuario],
+  [verificaToken],
   (req: Request, resp: Response) => {
     const crearMetodo = new MetodoPagoClass();
     crearMetodo.crearMetodoPago(req, resp);
@@ -21,7 +15,7 @@ metodoPagoRoute.post(
 
 metodoPagoRoute.put(
   "/editarMetodo",
-  [verificaToken, editarUsuario, editarMetodoPago],
+  [verificaToken],
   (req: Request, resp: Response) => {
     const editarMetodo = new MetodoPagoClass();
     editarMetodo.editarMetodoPago(req, resp);
@@ -46,18 +40,9 @@ metodoPagoRoute.get(
   }
 );
 
-metodoPagoRoute.get(
-  "/obtenerTododsMetodosCriterio",
-  [verificaToken],
-  (req: Request, resp: Response) => {
-    const obtenerTododsMetodosCriterio = new MetodoPagoClass();
-    obtenerTododsMetodosCriterio.obtenerTododsMetodosCriterio(req, resp);
-  }
-);
-
 metodoPagoRoute.delete(
   "/eliminarMetodoID",
-  [verificaToken, eliminarUsuario],
+  [verificaToken],
   (req: Request, resp: Response) => {
     const eliminarMetodoID = new MetodoPagoClass();
     eliminarMetodoID.eliminarMetodoID(req, resp);

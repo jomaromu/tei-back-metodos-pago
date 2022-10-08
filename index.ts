@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import fileUpload from 'express-fileupload';
-import Server from './class/server';
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import cors from "cors";
+import fileUpload from "express-fileupload";
+import Server from "./class/server";
 
 // rutas
-import metodoPagoRoute from './routes/metodoPagoRoute';
+import metodoPagoRoute from "./routes/metodoPagoRoute";
 
 // const server = new Server();
 const server = Server.instance;
@@ -20,16 +20,22 @@ server.app.use(fileUpload());
 // cors
 server.app.use(cors({ origin: true, credentials: true }));
 
+require("./models/workerModel");
+
 // conexion local
-mongoose.connect('mongodb://127.0.0.1:27017/todoImpresiones', { autoIndex: false }, (err) => {
+mongoose.connect(
+  "mongodb://127.0.0.1:27017/todoImpresiones",
+  { autoIndex: false },
+  (err) => {
     if (err) throw err;
-    console.log('Base de datos Online');
-});
+    console.log("Base de datos Online");
+  }
+);
 
 // usar las rutas
-server.app.use('/metodoPago', metodoPagoRoute);
+server.app.use("/metodoPago", metodoPagoRoute);
 
 // correr servidor
 server.start(() => {
-    console.log(`Servidor corriendo en el puerto: ${server.port}`);
+  console.log(`Servidor corriendo en el puerto: ${server.port}`);
 });
