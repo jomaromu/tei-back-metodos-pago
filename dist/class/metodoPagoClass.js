@@ -12,10 +12,12 @@ class MetodoPagoClass {
     constructor() { }
     crearMetodoPago(req, resp) {
         const idCreador = new mongoose.Types.ObjectId(req.usuario._id);
+        const foranea = new mongoose.Types.ObjectId(req.body.foranea);
         const nombre = req.body.nombre;
         const estado = req.body.estado;
         const nuevoMetodoPago = new metodoPagoModel_1.default({
             idCreador,
+            foranea,
             nombre,
             estado,
         });
@@ -41,14 +43,15 @@ class MetodoPagoClass {
         });
     }
     editarMetodoPago(req, resp) {
-        const id = new mongoose.Types.ObjectId(req.get("id"));
+        const _id = new mongoose.Types.ObjectId(req.body.id);
+        const foranea = new mongoose.Types.ObjectId(req.body.foranea);
         const nombre = req.body.nombre;
         const estado = req.body.estado;
         const query = {
             nombre,
             estado,
         };
-        metodoPagoModel_1.default.findById(id, (err, metodoDB) => {
+        metodoPagoModel_1.default.findOne({ _id, foranea }, (err, metodoDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -56,16 +59,16 @@ class MetodoPagoClass {
                     err,
                 });
             }
-            if (!metodoDB) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `No se encontró un método de pago con ese ID`,
-                });
-            }
+            // if (!metodoDB) {
+            //   return resp.json({
+            //     ok: false,
+            //     mensaje: `No se encontró un método de pago con ese ID`,
+            //   });
+            // }
             if (!query.nombre) {
                 query.nombre = metodoDB.nombre;
             }
-            metodoPagoModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, metodoDB) => {
+            metodoPagoModel_1.default.findOneAndUpdate({ _id, foranea }, query, { new: true }, (err, metodoDB) => {
                 if (err) {
                     return resp.json({
                         ok: false,
@@ -88,8 +91,9 @@ class MetodoPagoClass {
         });
     }
     obtenerMetodoID(req, resp) {
-        const id = req.get("id");
-        metodoPagoModel_1.default.findById(id, (err, metodoDB) => {
+        const _id = new mongoose.Types.ObjectId(req.get("id"));
+        const foranea = new mongoose.Types.ObjectId(req.get("foranea"));
+        metodoPagoModel_1.default.findOne({ _id, foranea }, (err, metodoDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -110,8 +114,9 @@ class MetodoPagoClass {
         });
     }
     obtenerTododsMetodos(req, resp) {
+        const foranea = mongoose.Types.ObjectId(req.get("foranea"));
         metodoPagoModel_1.default
-            .find({})
+            .find({ foranea })
             .populate("idCreador")
             .exec((err, metodosDB) => {
             if (err) {
@@ -128,8 +133,9 @@ class MetodoPagoClass {
         });
     }
     eliminarMetodoID(req, resp) {
-        const id = req.get("id");
-        metodoPagoModel_1.default.findByIdAndDelete(id, {}, (err, metodoDB) => {
+        const _id = new mongoose.Types.ObjectId(req.get("id"));
+        const foranea = new mongoose.Types.ObjectId(req.get("foranea"));
+        metodoPagoModel_1.default.findOneAndDelete({ _id, foranea }, {}, (err, metodoDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
